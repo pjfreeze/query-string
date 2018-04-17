@@ -1,0 +1,14 @@
+{
+  "name": "query-string",
+  "version": "1.0.0",
+  "description": "",
+  "main": "query-string.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "mocha": "3.3.0"
+  }
+}
