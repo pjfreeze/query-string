@@ -1,5 +1,6 @@
 /* QueryString
  * https://github.com/pjfreeze/query-string
+ *
  * This is free and unencumbered software released into the public domain.
  */
 (function (global) {
@@ -17,12 +18,14 @@
      * @returns {object} The returned object contains properties with decoded keys and values
      */
     static parse(url) {
-      if (!(typeof url == 'string')) return console.error('[QueryString.parse] "url" must be a string');
-
-      const parameters = {};
-      if (!url.includes('?')) return parameters;
+      if (typeof url != 'string') {
+        throw new TypeError('[QueryString.parse] "url" must be a string');
+      }
 
       const queryStringIndex = url.indexOf('?');
+      const doesNotHaveQueryString = queryStringIndex == -1;
+      if (doesNotHaveQueryString) return {};
+
       const hashIndex = url.includes('#') ? url.indexOf('#') : url.length;
       const queryString = url.slice(queryStringIndex + 1, hashIndex);
       const encodedPairs = queryString.split('&');
@@ -36,14 +39,15 @@
 
         if (hasExistingEntry) {
           const existingValue = parameters[decodedKey];
-          const existingValuesList = Array.isArray(existingValue) ? existingValue : [existingValue];
-          parameters[decodedKey] = existingValuesList.concat([decodedValue]);
+          const valueList = Array.isArray(existingValue) ? existingValue : [existingValue];
+          valueList.push(decodedValue);
+          parameters[decodedKey] = valueList;
         } else {
           parameters[decodedKey] = decodedValue;
         }
 
         return parameters;
-      }, parameters);
+      }, {});
     }
 
     /**
@@ -53,12 +57,17 @@
      * @returns {string} The query string includes the "?" character if there is one or more pairs
      */
     static stringify(parameters) {
-      if (!(typeof parameters == 'object')) return console.error('[QueryString.stringify] "parameters" must be an object');
+      if (typeof parameters != 'object' && parameters != null) {
+        throw new TypeError('[QueryString.stringify] "parameters" must be an object');
+      }
 
-      const pairs = Object.keys(parameters).map((key) => {
+      const keys = Object.keys(parameters);
+      if (keys.length == 0) return '';
+
+      const pairs = keys.map((key) => {
         const value = parameters[key];
         const encodedKey = encodeURIComponent(key);
-        let pair = '';
+        let pair;
         if (Array.isArray(value)) {
           const values = value.map(each => `${encodedKey}=${encodeURIComponent(each)}`);
           pair = values.join('&');
@@ -68,21 +77,19 @@
         return pair;
       });
 
-      return pairs.length > 0 ? `?${pairs.join('&')}` : '';
+      return `?${pairs.join('&')}`;
     }
   }
 
   // Export logic based on Scott Hamper's Cookies.js project
   // https://github.com/ScottHamper/Cookies/blob/1.2.3/src/cookies.js
-  if (typeof define === 'function' && define.amd) {
-    // AMD
+  if (typeof define == 'function' && define.amd) {
     define(function () { return QueryString; });
-  } else if (typeof exports === 'object') {
-    // Support Node.js specific `module.exports` (which can be a function)
-    if (typeof module === 'object' && typeof module.exports === 'object') {
+  } else if (typeof exports == 'object') {
+    if (typeof module == 'object' && typeof module.exports == 'object') {
       exports = module.exports = QueryString;
     }
   } else {
     global.QueryString = QueryString;
   }
-}(typeof window === 'undefined' ? this : window));
+}(typeof window == 'undefined' ? this : window));
