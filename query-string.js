@@ -17,7 +17,7 @@
      * @param {string} url - The URL to parse for query string keys/values
      * @returns {object} The returned object contains properties with decoded keys and values
      */
-    static parse(url) {
+    static parse (url) {
       if (typeof url != 'string') {
         throw new TypeError('[QueryString.parse] "url" must be a string');
       }
@@ -56,7 +56,7 @@
      * @param {object} parameters - The object to convert to a query string
      * @returns {string} The query string includes the "?" character if there is one or more pairs
      */
-    static stringify(parameters) {
+    static stringify (parameters) {
       if (typeof parameters != 'object' && parameters != null) {
         throw new TypeError('[QueryString.stringify] "parameters" must be an object');
       }
@@ -81,14 +81,13 @@
     }
   }
 
-  // Export logic based on Scott Hamper's Cookies.js project
-  // https://github.com/ScottHamper/Cookies/blob/1.2.3/src/cookies.js
   if (typeof define == 'function' && define.amd) {
     define(function () { return QueryString; });
   } else if (typeof exports == 'object') {
     if (typeof module == 'object' && typeof module.exports == 'object') {
       exports = module.exports = QueryString;
     }
+    exports.QueryString = QueryString;
   } else {
     global.QueryString = QueryString;
   }
